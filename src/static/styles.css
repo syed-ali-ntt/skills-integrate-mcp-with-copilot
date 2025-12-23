@@ -1,3 +1,28 @@
+/* Toolbar for activities filters and search */
+#activities-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+#activities-toolbar input[type="text"],
+#activities-toolbar select {
+  padding: 8px;
+  font-size: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 140px;
+}
+
+@media (max-width: 600px) {
+  #activities-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
 * {
   box-sizing: border-box;
   margin: 0;
