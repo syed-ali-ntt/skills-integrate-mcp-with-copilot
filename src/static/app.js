@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const activitiesList = document.getElementById("activities-list");
-  const activitySelect = document.getElementById("activity");
-  const signupForm = document.getElementById("signup-form");
+  // Removed activitySelect and signupForm
   const messageDiv = document.getElementById("message");
   const searchInput = document.getElementById("search-input");
   const categoryFilter = document.getElementById("category-filter");
@@ -17,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
       allActivities = activities;
       renderActivities();
       populateCategoryFilter();
-      populateActivitySelect();
+      // Removed populateActivitySelect()
     } catch (error) {
       activitiesList.innerHTML =
         "<p>Failed to load activities. Please try again later.</p>";
@@ -101,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="participants-container">
             ${participantsHTML}
           </div>
+          <button class="register-btn" data-activity="${name}">Register Student</button>
         `;
 
         activitiesList.appendChild(activityCard);
@@ -110,6 +110,12 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".delete-btn").forEach((button) => {
         button.addEventListener("click", handleUnregister);
       });
+
+      // Add event listeners to register buttons
+      document.querySelectorAll(".register-btn").forEach((button) => {
+        button.addEventListener("click", handleRegister);
+      });
+    }
     }
 
     // Populate category filter (if any categories exist)
@@ -131,15 +137,39 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Populate activity select dropdown
-    function populateActivitySelect() {
-      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
-      Object.keys(allActivities).forEach((name) => {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        activitySelect.appendChild(option);
-      });
+    // Removed populateActivitySelect()
+    // Handle register functionality
+    async function handleRegister(event) {
+      const activity = event.target.getAttribute("data-activity");
+      const email = prompt("Enter student email to register:");
+      if (!email) return;
+      try {
+        const response = await fetch(
+          `/activities/${encodeURIComponent(activity)}/signup?email=${encodeURIComponent(email)}`,
+          {
+            method: "POST",
+          }
+        );
+        const result = await response.json();
+        if (response.ok) {
+          messageDiv.textContent = result.message;
+          messageDiv.className = "success";
+          // Refresh activities list to show updated participants
+          fetchActivities();
+        } else {
+          messageDiv.textContent = result.detail || "An error occurred";
+          messageDiv.className = "error";
+        }
+        messageDiv.classList.remove("hidden");
+        setTimeout(() => {
+          messageDiv.classList.add("hidden");
+        }, 5000);
+      } catch (error) {
+        messageDiv.textContent = "Failed to register. Please try again.";
+        messageDiv.className = "error";
+        messageDiv.classList.remove("hidden");
+        console.error("Error registering:", error);
+      }
     }
   }
 
@@ -186,50 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Handle form submission
-  signupForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const email = document.getElementById("email").value;
-    const activity = document.getElementById("activity").value;
-
-    try {
-      const response = await fetch(
-        `/activities/${encodeURIComponent(
-          activity
-        )}/signup?email=${encodeURIComponent(email)}`,
-        {
-          method: "POST",
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        messageDiv.textContent = result.message;
-        messageDiv.className = "success";
-        signupForm.reset();
-
-        // Refresh activities list to show updated participants
-        fetchActivities();
-      } else {
-        messageDiv.textContent = result.detail || "An error occurred";
-        messageDiv.className = "error";
-      }
-
-      messageDiv.classList.remove("hidden");
-
-      // Hide message after 5 seconds
-      setTimeout(() => {
-        messageDiv.classList.add("hidden");
-      }, 5000);
-    } catch (error) {
-      messageDiv.textContent = "Failed to sign up. Please try again.";
-      messageDiv.className = "error";
-      messageDiv.classList.remove("hidden");
-      console.error("Error signing up:", error);
-    }
-  });
+  // Removed signup form submission logic
 
   // Initialize app
   fetchActivities();
